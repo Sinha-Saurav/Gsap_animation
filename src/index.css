@@ -121,25 +121,38 @@ body {
     transform:translate(-50%,-50%);
 }
 
-.coffee-stream-mask{
+.stream-wrapper{
     position:absolute;
     left:50%;
-    top:80%;
-    width:30px;
-    height:0;
-    overflow:hidden;
+    top:78%;
     transform:translateX(-50%);
+    overflow:hidden;
+     width:200px;
+    height:700px; 
+    z-index: -1; 
+}
+
+.stream-wrapper img{
+    clip-path: inset(0 0 100% 0);
+}
+
+.cocktail-cup, .cocktail-cup.latte{
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:640px;
+
+    transform:translate(-50%,-50%);
+    z-index:20;
+
     pointer-events:none;
+    will-change:transform,opacity;
+}
+
+.cocktail-cup.latte{
     opacity:0;
-    z-index:30;
 }
-
-.coffee-stream{
-    width:100%;
-    height:auto;
-    display:block;
-}
-
 
 @layer components {
     main {
@@ -219,7 +232,7 @@ body {
     }
 
     #cocktails {
-        @apply relative min-h-dvh w-full overflow-hidden z-50;
+        @apply relative min-h-dvh w-full overflow-hidden z-1;
 
         #c-left-leaf {
             @apply absolute left-0 md:bottom-0 md:top-auto -top-20 md:w-fit w-1/3;

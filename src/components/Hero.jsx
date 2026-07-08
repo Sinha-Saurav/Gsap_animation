@@ -26,7 +26,7 @@ const Hero = () => {
     const beanStageRef = useRef();
     const dustRefs = useRef([]);
     const flashRef = useRef();
-    const streamMaskRef = useRef();
+    const streamRef = useRef();
 
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -81,10 +81,13 @@ const Hero = () => {
             opacity: 0,
             scale: .3,
         });
-        gsap.set(streamMaskRef.current, {
+
+        gsap.set(streamRef.current, {
             opacity: 0,
-            height: 0,
+            clipPath: "inset(0 0 100% 0)",
+            transformOrigin: "top center",
         });
+
 
         const INTRO_DURATION = 1.4;
         const master = gsap.timeline({ delay: 0.3 });
@@ -147,22 +150,12 @@ const Hero = () => {
         const convergeTl = gsap.timeline({
             scrollTrigger: {
                 trigger: "#hero",
-                start: "top centre",
-                end: "+=80%",
+                start: "top",
+                end: "+=90%",
                 scrub: true,
             }
         })
 
-        gsap.to(streamMaskRef.current, {
-            height: 1800,
-            ease: "none",
-            scrollTrigger: {
-                trigger: "#hero",
-                start: "top top",
-                end: "bottom top",
-                scrub: true,
-            }
-        });
 
         beansRef.current.forEach((bean) => {
             convergeTl.to(bean, {
@@ -299,23 +292,28 @@ const Hero = () => {
                 opacity: 0,
                 scale: 2.6,
                 rotation: 45,
-                duration: .75,
+                duration: .95,
                 ease: "power1.out",
             },
             1.02
         );
 
-        //Coffee Stream
-        convergeTl.to(
-            streamMaskRef.current,
+        //coffee stream
+        convergeTl.fromTo(
+            streamRef.current,
+            {
+                opacity: 0,
+                clipPath: "inset(0 0 100% 0)",
+            },
             {
                 opacity: 1,
-                height: 120,
-                duration: .65,
-                ease: "power2.out",
+                clipPath: "inset(0 0 0% 0)",
+                duration: 1.8,
+                ease: "power2.in",
             },
-            1.02
+            0.95
         );
+
 
     }, []);
 
@@ -373,13 +371,11 @@ const Hero = () => {
                     ))}
 
                 </div>
-                <div
-                    ref={streamMaskRef}
-                    className="coffee-stream-mask"
-                >
+
+                <div className="stream-wrapper">
                     <img
+                        ref={streamRef}
                         src="/images/coffee-stream.png"
-                        className="coffee-stream"
                         alt=""
                     />
                 </div>

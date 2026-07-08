@@ -1,9 +1,14 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { cocktailLists, mockTailLists } from "../../constants";
+import { useRef } from "react";
 
 const Cocktails = () => {
-    useGSAP(()=>{
+
+    const cupRef = useRef();
+    const latteRef = useRef();
+
+    useGSAP(() => {
         const parallaxTimeline = gsap.timeline({
             scrollTrigger: {
                 trigger: '#cocktails',
@@ -14,18 +19,67 @@ const Cocktails = () => {
         })
 
         parallaxTimeline
-        .from('#c-left-leaf', {
-            x: -100, y: 100
-        })
-        .from('#c-right-leaf', {
-            x: 100, y:100
-        })
-    })
+            .from('#c-left-leaf', {
+                x: -100, y: 100
+            })
+            .from('#c-right-leaf', {
+                x: 100, y: 100
+            })
 
-    return(
+        gsap.set(cupRef.current, {
+            opacity: 1
+        });
+
+        gsap.set(latteRef.current, {
+            opacity: 0
+        });
+
+        const coffeeCupTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: '#cocktails',
+                start: 'top 20%',
+                end: 'bottom 10%',
+                scrub: true,
+            }
+        })
+
+        coffeeCupTl.to([cupRef.current, latteRef.current], {
+            y: 150,
+            ease: 'back.out'
+        })
+            .to(
+                cupRef.current,
+                {
+                    opacity: 0
+                },
+                0.2
+            )
+            .to(
+                latteRef.current,
+                {
+                    opacity: 1
+                },
+                0.2
+            );
+
+    }, [])
+
+    return (
         <section id="cocktails" className=''>
             <img src="/images/cocktail-left-leaf.png" alt="l-leaf" id="c-left-leaf" />
             <img src="/images/cocktail-right-leaf.png" alt="r-leaf" id="c-right-leaf" />
+
+            <img
+                ref={cupRef}
+                src="/images/coffee-mug.png"
+                className="cocktail-cup"
+            />
+
+            <img
+                ref={latteRef}
+                src="/images/coffee-mug-art.png"
+                className="cocktail-cup latte"
+            />
 
             <div className="list">
                 <div className="popular">
