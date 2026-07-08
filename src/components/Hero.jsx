@@ -11,14 +11,22 @@ const BEAN_IMAGES = [
     "/images/coffee-4.png",
 ];
 
-const BEAN_COUNT = 12;
+const DUST_IMAGES = [
+    "/images/coffee-dust-1.png",
+    "/images/coffee-dust-2.png",
+    "/images/coffee-dust-3.png",
+]
+
+const BEAN_COUNT = 20;
 
 const Hero = () => {
     const mugRef = useRef();
-    const overlayRef = useRef(); 
+    const overlayRef = useRef();
     const beansRef = useRef([]);
     const beanStageRef = useRef();
-    const canvasRef = useRef();
+    const dustRefs = useRef([]);
+    const flashRef = useRef();
+    const streamMaskRef = useRef();
 
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -33,6 +41,8 @@ const Hero = () => {
         }));
     }, []);
 
+
+
     useGSAP(() => {
         const heroSplit = new SplitText('.title', { type: 'chars, words' });
         const paragraphSplit = new SplitText('.subtitle', { type: 'lines' });
@@ -42,7 +52,7 @@ const Hero = () => {
         const targetChar = heroSplit.chars.filter(
             (c) => c.textContent === 'O'
         ).pop();
-        
+
         const targetRect = targetChar.getBoundingClientRect();
         const mugRect = mugRef.current.getBoundingClientRect();
 
@@ -55,11 +65,26 @@ const Hero = () => {
         gsap.set(paragraphSplit.lines, { opacity: 0, yPercent: 100 });
 
         gsap.set(beansRef.current, {
+            x: (i) => beanData[i].x * window.innerWidth / 100,
+            y: (i) => beanData[i].y * window.innerHeight / 100,
             opacity: 0,
             scale: (i) => beanData[i].scale * 0.5,
             xPercent: -50,
             yPercent: -50,
-        }); 
+        });
+        gsap.set(dustRefs.current, {
+            opacity: 0,
+            scale: .2,
+            rotation: 0,
+        });
+        gsap.set(flashRef.current, {
+            opacity: 0,
+            scale: .3,
+        });
+        gsap.set(streamMaskRef.current, {
+            opacity: 0,
+            height: 0,
+        });
 
         const INTRO_DURATION = 1.4;
         const master = gsap.timeline({ delay: 0.3 });
@@ -78,14 +103,14 @@ const Hero = () => {
             .to(heroSplit.chars, {
                 yPercent: 0,
                 duration: INTRO_DURATION,
-                ease: 'expo.out',
+                ease: 'back.inOut',
                 stagger: 0.06,
-            }, 0) 
+            }, 0)
             .to(overlayRef.current, {
                 opacity: 0,
                 duration: INTRO_DURATION * 0.6,
                 pointerEvents: 'none',
-            }, INTRO_DURATION * 0.3) 
+            }, INTRO_DURATION * 0.3)
             .to(paragraphSplit.lines, {
                 opacity: 1,
                 yPercent: 0,
@@ -98,8 +123,8 @@ const Hero = () => {
                 scale: (i) => beanData[i].scale,
                 duration: 1,
                 ease: 'back.out(1.4)',
-                stagger: { each: 0.06, from: 'random' },
-            }, `+=0.5`);
+                stagger: { each: 0.04, from: 'random' },
+            }, INTRO_DURATION);
 
         // once landed, kill pointer events / mark mug as static
         master.set(mugRef.current, { pointerEvents: 'none' });
@@ -119,89 +144,194 @@ const Hero = () => {
         const startValue = isMobile ? 'top 50%' : 'center 60%';
         const endValue = isMobile ? '120% top' : 'bottom top';
 
-        // --- BEAN CONVERGENCE + DUST CLOUD, scroll-pinned ---
-        const ctx = canvasRef.current.getContext('2d');
-        let particles = [];
-
-        const resizeCanvas = () => {
-            canvasRef.current.width = beanStageRef.current.offsetWidth;
-            canvasRef.current.height = beanStageRef.current.offsetHeight;
-        };
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        const PARTICLE_COUNT = 150;
-        particles = Array.from({ length: PARTICLE_COUNT }, () => ({
-            angle: gsap.utils.random(0, Math.PI * 2),
-            radius: gsap.utils.random(20, 140),
-            size: gsap.utils.random(1.5, 4),
-            speed: gsap.utils.random(0.3, 1),
-        }));
-
-        const drawDust = (progress) => {
-            const w = canvasRef.current.width;
-            const h = canvasRef.current.height;
-            ctx.clearRect(0, 0, w, h);
-            if (progress <= 0) return;
-
-            ctx.fillStyle = `rgba(90, 55, 35, ${Math.min(progress * 1.2, 0.9)})`;
-            particles.forEach((p) => {
-                const spread = progress * p.radius * p.speed;
-                const px = w / 2 + Math.cos(p.angle) * spread;
-                const py = h / 2 + Math.sin(p.angle) * spread * 0.6;
-                ctx.beginPath();
-                ctx.arc(px, py, p.size * progress, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        };
-
         const convergeTl = gsap.timeline({
             scrollTrigger: {
-                trigger: beanStageRef.current,
-                start: 'top top',
-                end: '+=150%',
+                trigger: "#hero",
+                start: "top centre",
+                end: "+=80%",
                 scrub: true,
-                pin: true,
+            }
+        })
+
+        gsap.to(streamMaskRef.current, {
+            height: 1800,
+            ease: "none",
+            scrollTrigger: {
+                trigger: "#hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
             }
         });
 
         beansRef.current.forEach((bean) => {
             convergeTl.to(bean, {
+                scale: (i) => beanData[i].scale * 0.15,
                 x: 0,
-                y: 0,
-                scale: 0,
-                rotation: `+=${gsap.utils.random(180, 540)}`,
-                ease: 'power2.in',
-                duration: 1,
+                y: +100,
+                rotation: "+=360",
+                ease: "power2.in"
             }, 0);
         });
 
-        convergeTl.to(beansRef.current, { opacity: 0, duration: 0.3 }, 0.7);
-        convergeTl.to({}, {
-            duration: 1,
-            onUpdate: function () {
-                drawDust(this.progress());
-            }
-        }, 0.6);
+        // IMPACT FLASH
+        convergeTl.fromTo(
+            flashRef.current,
+            {
+                opacity: 0,
+                scale: .2,
+            },
+            {
+                opacity: .45,
+                scale: 2.8,
+                duration: .50,
+                ease: "power2.out",
+            },
+            .55
+        );
 
-        return () => window.removeEventListener('resize', resizeCanvas);
+        convergeTl.to(
+            flashRef.current,
+            {
+                opacity: 0,
+                duration: .75,
+                ease: "power2.out",
+            },
+            .73
+        );
+
+        // HIDE BEANS
+        convergeTl.to(
+            beansRef.current,
+            {
+                opacity: 0,
+                duration: .12,
+                stagger: {
+                    each: .003,
+                    from: "random",
+                }
+            },
+            .55
+        );
+
+        // DUST 1
+        convergeTl.fromTo(
+            dustRefs.current[0],
+            {
+                opacity: 0,
+                scale: .15,
+                rotation: -20,
+            },
+            {
+                opacity: .9,
+                scale: .9,
+                rotation: 15,
+                duration: .18,
+                ease: "power2.out",
+            },
+            .55
+        );
+
+        convergeTl.to(
+            dustRefs.current[0],
+            {
+                opacity: 0,
+                scale: 1.4,
+                rotation: 30,
+                duration: .30,
+                filter: "blur(6px)",
+                ease: "power1.out",
+            },
+            .73
+        );
+
+        // DUST 2
+        convergeTl.fromTo(
+            dustRefs.current[1],
+            {
+                opacity: 0,
+                scale: .25,
+                rotation: 18,
+            },
+            {
+                opacity: .95,
+                scale: 1.15,
+                rotation: -15,
+                duration: .22,
+                ease: "power3.out",
+            },
+            .63
+        );
+
+        convergeTl.to(
+            dustRefs.current[1],
+            {
+                opacity: 0,
+                scale: 1.7,
+                rotation: -35,
+                duration: .35,
+                ease: "power1.out",
+            },
+            .87
+        );
+
+        // FINAL EXPLOSION
+        convergeTl.fromTo(
+            dustRefs.current[2],
+            {
+                opacity: 0,
+                scale: .45,
+                rotation: -12,
+            },
+            {
+                opacity: 1,
+                scale: 1.7,
+                rotation: 12,
+                duration: .25,
+                ease: "power4.out",
+            },
+            .76
+        );
+
+        convergeTl.to(
+            dustRefs.current[2],
+            {
+                opacity: 0,
+                scale: 2.6,
+                rotation: 45,
+                duration: .75,
+                ease: "power1.out",
+            },
+            1.02
+        );
+
+        //Coffee Stream
+        convergeTl.to(
+            streamMaskRef.current,
+            {
+                opacity: 1,
+                height: 120,
+                duration: .65,
+                ease: "power2.out",
+            },
+            1.02
+        );
 
     }, []);
 
+
     return (
         <>
-            {/* Black backdrop — fades away, does NOT contain the mug */}
-            <div ref={overlayRef} className="intro-overlay" />
 
-            {/* Mug — independent layer, stays fully visible, keeps final position */}
-            <img
-                ref={mugRef}
-                src="/images/coffee-mug-complete.png"
-                alt="coffee mug"
-                className="intro-mug"
-            />
+            <section id="hero" className="">
+                <div ref={overlayRef} className="intro-overlay" />
 
-            <section id="hero" className="noisy">
+                <img
+                    ref={mugRef}
+                    src="/images/coffee-mug-complete.png"
+                    alt="coffee mug"
+                    className="intro-mug"
+                />
                 <h1 className="title">ESPRESSO</h1>
 
                 <img src="/images/hero-left-leaf.png" alt="left-leaf" className="left-leaf" />
@@ -216,13 +346,42 @@ const Hero = () => {
                             alt=""
                             className="coffee-bean"
                             style={{
-                                left: `calc(50% + ${bean.x}vw)`,
-                                top: `calc(50% + ${bean.y}vh)`,
-                                rotate: `translate(-50%, -50%) rotate(${bean.rotation}deg)`,
+                                left: "50%",
+                                top: "62%",
+                                transform: `translate(-50%, -50%) rotate(${bean.rotation}deg)`,
                             }}
                         />
                     ))}
-                    <canvas ref={canvasRef} className="dust-canvas" />
+
+                    {/* Flash */}
+
+                    <div
+                        ref={flashRef}
+                        className="collision-flash"
+                    />
+
+                    {/* Dust */}
+
+                    {DUST_IMAGES.map((src, i) => (
+                        <img
+                            key={src}
+                            ref={(el) => (dustRefs.current[i] = el)}
+                            src={src}
+                            className="coffee-dust"
+                            alt=""
+                        />
+                    ))}
+
+                </div>
+                <div
+                    ref={streamMaskRef}
+                    className="coffee-stream-mask"
+                >
+                    <img
+                        src="/images/coffee-stream.png"
+                        className="coffee-stream"
+                        alt=""
+                    />
                 </div>
 
                 <div className="body">
@@ -244,7 +403,7 @@ const Hero = () => {
                 </div>
             </section>
         </>
-    );
+    )
 };
 
 export default Hero;
