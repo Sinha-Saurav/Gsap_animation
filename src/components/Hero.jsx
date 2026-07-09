@@ -321,7 +321,7 @@ const Hero = () => {
     return (
         <>
 
-            <section id="hero" className="">
+            <section id="hero" className="noisy">
                 <div ref={overlayRef} className="intro-overlay" />
 
                 <img

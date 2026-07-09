@@ -43,29 +43,19 @@ const Cocktails = () => {
             }
         })
 
-        coffeeCupTl.to([cupRef.current, latteRef.current], {
-            y: 150,
-            ease: 'back.out'
-        })
-            .to(
-                cupRef.current,
-                {
-                    opacity: 0
-                },
-                0.2
-            )
-            .to(
-                latteRef.current,
-                {
-                    opacity: 1
-                },
-                0.2
-            );
+        coffeeCupTl
+            .to([cupRef.current, latteRef.current], {
+                y: 150,
+                ease: "back.out",
+                duration: 1
+            })
+            .to(cupRef.current, { opacity: 0, duration: 0.2, ease: "none" }, ">")
+            .to(latteRef.current, { opacity: 1, duration: 0.2, ease: "none" }, "<");
 
     }, [])
 
     return (
-        <section id="cocktails" className=''>
+        <section id="cocktails" className='noisy'>
             <img src="/images/cocktail-left-leaf.png" alt="l-leaf" id="c-left-leaf" />
             <img src="/images/cocktail-right-leaf.png" alt="r-leaf" id="c-right-leaf" />
 
