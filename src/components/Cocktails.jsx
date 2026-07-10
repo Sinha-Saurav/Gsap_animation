@@ -38,21 +38,30 @@ const Cocktails = () => {
             scrollTrigger: {
                 trigger: '#cocktails',
                 start: 'top 20%',
-                end: 'bottom 10%',
+                end: 'bottom 90%',
                 scrub: true,
+                once: true,
             }
         })
 
         coffeeCupTl
             .to([cupRef.current, latteRef.current], {
-                y: 150,
-                ease: "back.out",
-                duration: 1
+                y: 300,
+                ease: "none",
             })
-            .to(cupRef.current, { opacity: 0, duration: 0.2, ease: "none" }, ">")
-            .to(latteRef.current, { opacity: 1, duration: 0.2, ease: "none" }, "<");
 
-    }, [])
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: "#cocktails",
+                start: "bottom 80%",      // tune this point
+                toggleActions: "play none none none",
+                once: true,
+            },
+            defaults: { overwrite: "auto" },
+        })
+            .to(cupRef.current, { opacity: 0, duration: 0.2, ease: "none" })
+            .to(latteRef.current, { opacity: 1, duration: 0.2, ease: "none" }, "<");
+    }, []);
 
     return (
         <section id="cocktails" className='noisy'>
