@@ -48,7 +48,7 @@ const Cocktails = () => {
             .to([cupRef.current, latteRef.current], {
                 y: 300,
                 ease: "none",
-            })
+            }, 0)
 
         gsap.timeline({
             scrollTrigger: {
