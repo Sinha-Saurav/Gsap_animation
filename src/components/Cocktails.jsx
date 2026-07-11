@@ -7,6 +7,7 @@ const Cocktails = () => {
 
     const cupRef = useRef();
     const latteRef = useRef();
+    const steamRef = useRef();
 
     useGSAP(() => {
         const parallaxTimeline = gsap.timeline({
@@ -34,6 +35,11 @@ const Cocktails = () => {
             opacity: 0
         });
 
+        gsap.set(steamRef.current, {
+            opacity: 0,
+            y: 20,
+        });
+
         const coffeeCupTl = gsap.timeline({
             scrollTrigger: {
                 trigger: '#cocktails',
@@ -43,6 +49,22 @@ const Cocktails = () => {
                 once: true,
             }
         })
+
+        const steamTimeline = gsap.timeline({
+            paused: true,
+            repeat: -1,
+            defaults: {
+                ease: 'sine.out',
+            },
+        });
+
+        steamTimeline
+            .fromTo('.steam-1', { opacity: 0, y: 14, x: 0, scale: 0.9 }, { opacity: 0.95, y: -72, x: -4, scale: 1.02, duration: 1.35 }, 0)
+            .to('.steam-1', { opacity: 0, y: -104, x: -10, scale: 1.08, duration: 0.8 }, 0.8)
+            .fromTo('.steam-2', { opacity: 0, y: 14, x: 0, scale: 0.9 }, { opacity: 0.95, y: -72, x: 3, scale: 1.02, duration: 1.35 }, 0.55)
+            .to('.steam-2', { opacity: 0, y: -104, x: 8, scale: 1.08, duration: 0.8 }, 1.35)
+            .fromTo('.steam-3', { opacity: 0, y: 14, x: 0, scale: 0.9 }, { opacity: 0.95, y: -72, x: -2, scale: 1.02, duration: 1.35 }, 1.1)
+            .to('.steam-3', { opacity: 0, y: -104, x: 6, scale: 1.08, duration: 0.8 }, 1.9);
 
         gsap.timeline({
             scrollTrigger: {
@@ -55,6 +77,13 @@ const Cocktails = () => {
         })
             .to(cupRef.current, { opacity: 0, duration: 0.2, ease: "none" })
             .to(latteRef.current, { opacity: 1, duration: 0.2, ease: "none" }, "<")
+            .to(steamRef.current, { opacity: 1, duration: 0.05, ease: "none", onStart: () => steamTimeline.play(0) }, "<")
+
+        return () => {
+            steamTimeline.kill();
+            coffeeCupTl.kill();
+            parallaxTimeline.kill();
+        };
     }, []);
 
     return (
@@ -62,17 +91,25 @@ const Cocktails = () => {
             <img src="/images/cocktail-left-leaf.png" alt="l-leaf" id="c-left-leaf" />
             <img src="/images/cocktail-right-leaf.png" alt="r-leaf" id="c-right-leaf" />
 
-            <img
-                ref={cupRef}
-                src="/images/coffee-mug.png"
-                className="cocktail-cup"
-            />
+            <div className="cocktail-cup-stage">
+                <img
+                    ref={cupRef}
+                    src="/images/coffee-mug.png"
+                    className="cocktail-cup"
+                />
 
-            <img
-                ref={latteRef}
-                src="/images/coffee-mug-art.png"
-                className="cocktail-cup latte"
-            />
+                <div ref={steamRef} className="steam-stage" aria-hidden="true">
+                    <img src="/images/steam-1.png" alt="" className="steam-item steam-1" />
+                    <img src="/images/steam-2.png" alt="" className="steam-item steam-2" />
+                    <img src="/images/steam-3.png" alt="" className="steam-item steam-3" />
+                </div>
+
+                <img
+                    ref={latteRef}
+                    src="/images/coffee-mug-art.png"
+                    className="cocktail-cup latte"
+                />
+            </div>
 
             <div className="list">
                 <div className="popular">

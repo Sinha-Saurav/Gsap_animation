@@ -150,6 +150,69 @@ body {
     opacity:0;
 }
 
+.cocktail-cup-stage{
+    position:absolute;
+    left:50%;
+    top:90%;
+    width:clamp(240px, 42vw, 640px);
+    transform:translate(-50%,-50%);
+    z-index:20;
+    pointer-events:none;
+}
+
+.cocktail-cup-stage .cocktail-cup{
+    position:relative;
+    top:auto;
+    left:auto;
+    width:100%;
+    display:block;
+    transform:none;
+}
+
+.cocktail-cup-stage .cocktail-cup.latte{
+    position:absolute;
+    inset:0;
+    width:100%;
+    opacity:0;
+}
+
+.steam-stage{
+    position:absolute;
+    left:50%;
+    bottom:90%;
+    width:74%;
+    height:44%;
+    transform:translateX(-50%);
+    z-index:30;
+    pointer-events:none;
+    opacity:0;
+    will-change:transform,opacity;
+}
+
+.steam-item{
+    position:absolute;
+    left:50%;
+    top:16%;
+    width:clamp(88px, 16vw, 192px);
+    height:auto;
+    opacity:0;
+    transform-origin:center bottom;
+    transform:translateX(-50%);
+    will-change:transform,opacity;
+}
+
+.steam-1{
+    z-index:3;
+}
+
+.steam-2{
+    z-index:2;
+}
+
+.steam-3{
+    z-index:1;
+}
+
 @layer components {
     main {
         @apply w-full overflow-x-hidden;
