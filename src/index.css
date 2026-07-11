@@ -121,30 +121,21 @@ body {
     transform:translate(-50%,-50%);
 }
 
-.stream-wrapper{
-    position:absolute;
-    left:50%;
-    top:10%;
-    transform:translateX(-50%);
-    overflow:hidden;
-    width: clamp(70px, 14vw, 170px);
-    height: clamp(260px, 46vh, 520px);
-    z-index: 15;
-    pointer-events:none;
+.drop-stage{
+    position: absolute;
+    top: 78%;
+    left: 47%;
 }
 
-.stream-wrapper img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    clip-path: inset(0 0 100% 0);
-    will-change: transform, opacity, clip-path;
+.drop-stage img{
+    width: 80px;
+    pointer-events: none;
 }
 
 .cocktail-cup, .cocktail-cup.latte{
     position:absolute;
     left:50%;
-    top:42%;
+    top:90%;
 
     width:clamp(240px, 42vw, 640px);
 

@@ -125,7 +125,7 @@ const Order = () => {
                 </div>
 
                 {/* ── Collage grid ─────────────────────────────────────── */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grid-flow-dense auto-rows-[150px] md:auto-rows-[170px] gap-4 md:gap-5 pb-32">
+                <div className="grid  grid-cols-2 md:grid-cols-3 lg:grid-cols-4 grid-flow-dense auto-rows-[150px] md:auto-rows-[170px] gap-4 md:gap-5 pb-32">
                     {filteredItems.map((item) => {
                         const inCart = cart.find((c) => c.id === item.id);
                         return (

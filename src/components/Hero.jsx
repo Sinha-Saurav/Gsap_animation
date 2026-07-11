@@ -26,7 +26,7 @@ const Hero = () => {
     const beanStageRef = useRef();
     const dustRefs = useRef([]);
     const flashRef = useRef();
-    const streamRef = useRef();
+    const dropRef = useRef();
 
     const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -50,38 +50,38 @@ const Hero = () => {
                 if (document.fonts?.ready) {
                     await document.fonts.ready;
                 }
-    
+
                 await new Promise((resolve) => requestAnimationFrame(() => resolve()));
                 await new Promise((resolve) => requestAnimationFrame(() => resolve()));
             };
-    
+
             await waitForLayout();
-    
+
             const heroSplit = new SplitText('.title', { type: 'chars, words' });
             const paragraphSplit = new SplitText('.subtitle', { type: 'lines' });
-    
+
             heroSplit.chars.forEach((char) => char.classList.add('text-gradient'));
-    
+
             const targetChar = heroSplit.chars.filter(
                 (c) => c.textContent === 'O'
             ).pop();
-    
+
             const targetRect = targetChar.getBoundingClientRect();
             const mugRect = mugRef.current.getBoundingClientRect();
-    
+
             const targetX =
                 (targetRect.left + targetRect.width / 2) -
                 (mugRect.left + mugRect.width / 2);
-    
+
             const targetY =
                 (targetRect.top + targetRect.height / 2) -
                 (mugRect.top + mugRect.height / 2);
             const targetScale = targetRect.width / mugRect.width;
-    
+
             gsap.set(targetChar, { opacity: 0 });
             gsap.set(heroSplit.chars, { yPercent: 100 });
             gsap.set(paragraphSplit.lines, { opacity: 0, yPercent: 100 });
-    
+
             gsap.set(beansRef.current, {
                 x: (i) => beanData[i].x * window.innerWidth / 100,
                 y: (i) => beanData[i].y * window.innerHeight / 100,
@@ -99,15 +99,18 @@ const Hero = () => {
                 opacity: 0,
                 scale: .3,
             });
-    
-    
-    
+            gsap.set(dropRef.current, {
+                opacity: 0,
+                scale: 0,
+            })
+
+
             const INTRO_DURATION = 1.4;
             const master = gsap.timeline({ delay: 0.3 });
-    
+
             // Mug animation and title reveal run TOGETHER, same duration
             const yOffset = -25;
-    
+
             master.to(mugRef.current, {
                 duration: INTRO_DURATION,
                 ease: 'power3.inOut',
@@ -141,10 +144,10 @@ const Hero = () => {
                     ease: 'back.out(1.4)',
                     stagger: { each: 0.04, from: 'random' },
                 }, INTRO_DURATION);
-    
+
             // once landed, kill pointer events / mark mug as static
             master.set(mugRef.current, { pointerEvents: 'none' });
-    
+
             // --- existing scroll animations unchanged ---
             gsap.timeline({
                 scrollTrigger: {
@@ -159,7 +162,7 @@ const Hero = () => {
 
             const startValue = isMobile ? 'top 50%' : 'center 60%';
             const endValue = isMobile ? '120% top' : 'bottom top';
-    
+
             const convergeTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: "#hero",
@@ -169,8 +172,8 @@ const Hero = () => {
                     once: true,
                 }
             })
-    
-    
+
+
             beansRef.current.forEach((bean) => {
                 convergeTl.to(bean, {
                     scale: (i) => beanData[i].scale * 0.15,
@@ -180,7 +183,7 @@ const Hero = () => {
                     ease: "power2.in"
                 }, 0);
             });
-    
+
             // IMPACT FLASH
             convergeTl.fromTo(
                 flashRef.current,
@@ -196,7 +199,7 @@ const Hero = () => {
                 },
                 .55
             );
-    
+
             convergeTl.to(
                 flashRef.current,
                 {
@@ -206,7 +209,7 @@ const Hero = () => {
                 },
                 .73
             );
-    
+
             // HIDE BEANS
             convergeTl.to(
                 beansRef.current,
@@ -220,7 +223,7 @@ const Hero = () => {
                 },
                 0.5
             );
-    
+
             // DUST 1
             convergeTl.fromTo(
                 dustRefs.current[0],
@@ -238,7 +241,7 @@ const Hero = () => {
                 },
                 .55
             );
-    
+
             convergeTl.to(
                 dustRefs.current[0],
                 {
@@ -251,7 +254,7 @@ const Hero = () => {
                 },
                 .73
             );
-    
+
             // DUST 2
             convergeTl.fromTo(
                 dustRefs.current[1],
@@ -269,7 +272,7 @@ const Hero = () => {
                 },
                 .63
             );
-    
+
             convergeTl.to(
                 dustRefs.current[1],
                 {
@@ -281,7 +284,7 @@ const Hero = () => {
                 },
                 .87
             );
-    
+
             // FINAL EXPLOSION
             convergeTl.fromTo(
                 dustRefs.current[2],
@@ -299,7 +302,7 @@ const Hero = () => {
                 },
                 .76
             );
-    
+
             convergeTl.to(
                 dustRefs.current[2],
                 {
@@ -311,7 +314,31 @@ const Hero = () => {
                 },
                 1.02
             );
-           
+
+            convergeTl.to(
+                dropRef.current,{
+                    opacity: 1,
+                    scale: 0.5,
+                    duration: 0.3,
+                },
+                0.7
+            )
+            convergeTl.to(
+                dropRef.current,
+                {
+                    scale: 1,
+                    duration: 3,
+                    y: "580px",
+                    ease: 'none',
+                },
+                0.7
+            )
+            convergeTl.to(dropRef.current, {
+                opacity: 0,
+                ease: 'none',
+            },
+        )
+
         };
 
         run();
@@ -373,12 +400,9 @@ const Hero = () => {
 
                 </div>
 
-                <div className="stream-wrapper">
-                    <img
-                        ref={streamRef}
-                        id="coffee-stream"
-                        src="/images/coffee-stream.png"
-                        alt=""
+                <div className ="drop-stage" ref={dropRef}>
+                    <img 
+                        src="/images/coffee-drop.png" 
                     />
                 </div>
 
