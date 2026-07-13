@@ -109,7 +109,7 @@ const Hero = () => {
             const master = gsap.timeline({ delay: 0.3 });
 
             // Mug animation and title reveal run TOGETHER, same duration
-            const yOffset = -25;
+            const yOffset = isMobile ? -8 : -25;
 
             master.to(mugRef.current, {
                 duration: INTRO_DURATION,
@@ -315,6 +315,7 @@ const Hero = () => {
                 1.02
             );
 
+            const yLength = isMobile ? "900px" : "34.75rem";
             convergeTl.to(
                 dropRef.current,{
                     opacity: 1,
@@ -328,7 +329,7 @@ const Hero = () => {
                 {
                     scale: 1,
                     duration: 3,
-                    y: "580px",
+                    y: yLength,
                     ease: 'none',
                 },
                 0.7
